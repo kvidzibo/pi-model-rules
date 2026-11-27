@@ -1,0 +1,56 @@
+{
+  "name": "@kvidzibo/pi-model-rules",
+  "version": "0.1.0",
+  "description": "Per-model rules for Pi: add instructions to the system prompt only when a matching model is active.",
+  "type": "module",
+  "license": "MIT",
+  "author": "Tomas Rackauskas",
+  "keywords": [
+    "pi-package",
+    "rules",
+    "models",
+    "system-prompt"
+  ],
+  "engines": {
+    "node": ">=22.19.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kvidzibo/pi-model-rules.git"
+  },
+  "homepage": "https://github.com/kvidzibo/pi-model-rules#readme",
+  "bugs": {
+    "url": "https://github.com/kvidzibo/pi-model-rules/issues"
+  },
+  "pi": {
+    "extensions": [
+      "./index.ts"
+    ]
+  },
+  "files": [
+    "index.ts",
+    "src/",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "test": "node --test --experimental-strip-types tests/*.test.ts",
+    "prepublishOnly": "npm test"
+  },
+  "peerDependencies": {
+    "@earendil-works/pi-coding-agent": "*"
+  },
+  "peerDependenciesMeta": {
+    "@earendil-works/pi-coding-agent": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@earendil-works/pi-coding-agent": "1.6.1"
+  }
+}
