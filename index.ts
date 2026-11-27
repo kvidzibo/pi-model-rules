@@ -13,7 +13,11 @@ export default function (pi: ExtensionAPI) {
 		const sections = event.systemPromptOptions.sections;
 		let text = "";
 		try {
-			if (ctx.model) text = (await rulesFor((await loadRulesDir(getAgentDir())).dir, ctx.model)).text;
+			if (ctx.model) {
+				// Only the unconfigured default folder may be absent; a missing custom folder is a mistake.
+				const { dir, custom } = await loadRulesDir(getAgentDir());
+				text = (await rulesFor(dir, ctx.model, !custom)).text;
+			}
 			reported = undefined;
 		} catch (error) {
 			const warning = `${message(error)} — model rules not applied`;

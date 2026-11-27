@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
@@ -24,6 +24,10 @@ test("patterns match the model ID, or provider/id when they contain a slash", ()
 	assert.equal(matches(patternOf("anthropic__claude-*.md"), routed), false);
 	assert.equal(matches(patternOf("openrouter__anthropic__claude-*.md"), routed), true);
 	assert.equal(matches(patternOf("*.md"), routed), true);
+	assert.equal(matches("a*a", { provider: "p", id: "a" }), false);
+	assert.equal(matches("c*-f*-2", fable), true);
+	assert.equal(matches("c*-x*-2", fable), false);
+	assert.equal(matches("*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*b", { provider: "p", id: "a".repeat(5000) }), false);
 });
 
 test("matching files are concatenated least specific first; empty and non-rule files are skipped", async (t) => {
@@ -38,7 +42,19 @@ test("matching files are concatenated least specific first; empty and non-rule f
 		["*.md", "gpt-*.md", "claude-*.md", "claude-fable-*.md", "anthropic__claude-*.md"]);
 	assert.deepEqual(await rulesFor(dir, { provider: "anthropic", id: "claude-fable-5-2" }),
 		{ files: ["*.md", "claude-fable-*.md", "anthropic__claude-*.md"], text: "all\n\nfable\n\nanthropic" });
-	assert.deepEqual(await rulesFor(join(dir, "missing"), { provider: "openai", id: "gpt-5" }), { files: [], text: "" });
+	assert.deepEqual(await rulesFor(join(dir, "missing"), { provider: "openai", id: "gpt-5" }, true), { files: [], text: "" });
+	await assert.rejects(rulesFor(join(dir, "missing"), { provider: "openai", id: "gpt-5" }), /ENOENT/);
+});
+
+test("an exact model ID outranks a broader provider wildcard; only regular files are rules", async (t) => {
+	const dir = temp(t);
+	writeFileSync(join(dir, "gpt-5.md"), "exact");
+	writeFileSync(join(dir, "*__gpt-5*.md"), "broad");
+	mkdirSync(join(dir, "gpt-*.md"));
+	symlinkSync(join(dir, "gpt-*.md"), join(dir, "gpt-5*.md"));
+	symlinkSync(join(dir, "gpt-5.md"), join(dir, "gpt-*5.md"));
+	assert.deepEqual(await rulesFor(dir, { provider: "openai", id: "gpt-5" }),
+		{ files: ["*__gpt-5*.md", "gpt-*5.md", "gpt-5.md"], text: "broad\n\nexact\n\nexact" });
 });
 
 test("rules folder setting persists, resets, and rejects relative paths", async (t) => {

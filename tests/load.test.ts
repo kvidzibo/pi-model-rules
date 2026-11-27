@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -44,4 +44,24 @@ test("manifest loads through Pi and the model_rules section follows the active m
 	assert.deepEqual(sections, { other: "kept" });
 	assert.equal(warnings.length, 1);
 	assert.match(warnings[0], /Invalid config.*model rules not applied/);
+
+	// The menu still offers the folder row, so a blank value resets the broken setting.
+	const titles: string[] = [];
+	const picks = [(options: string[]) => options[0], () => undefined];
+	await extension.commands.get("pi-model-rules").handler("", {
+		hasUI: true, model: { provider: "test", id: "claude-fable-5-2" }, modelRegistry: { getAvailable: () => [] },
+		ui: {
+			select: async (title: string, options: string[]) => { titles.push(title); return picks.shift()!(options); },
+			input: async () => "",
+			notify: (text: string) => assert.fail(text),
+		},
+	});
+	assert.match(titles[0], /Rules not applied: Invalid config/);
+	assert.match(titles[1], /1 rule file active/);
+	assert.equal(existsSync(join(home, "pi-model-rules.json")), false);
+
+	writeFileSync(join(home, "pi-model-rules.json"), JSON.stringify({ rulesDir: join(home, "moved") }));
+	await run("claude-fable-5-2");
+	assert.deepEqual(sections, { other: "kept" });
+	assert.match(warnings[1], /ENOENT.*model rules not applied/);
 });

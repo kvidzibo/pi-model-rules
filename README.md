@@ -33,8 +33,10 @@ The file name, without `.md`, is a pattern for the models the file applies to:
 - `*` matches any run of characters; matching is case-sensitive.
 - `__` stands for `/`. A pattern containing it is matched against
   `provider/model-id`; any other pattern is matched against the model ID alone.
-- All matching files apply. They are joined least specific first, so the most
-  specific file comes last. Empty files are ignored.
+- All matching files apply. They are joined least specific first — fewer literal
+  characters, then more wildcards — so the most specific file comes last.
+- Only regular `.md` files count, including symlinks to them. Empty files are
+  ignored.
 
 The text is added to the system prompt as a `<model_rules>` section, alongside
 your `AGENTS.md` rules. Files are read at the start of every run, so edits and
@@ -63,8 +65,11 @@ return to the default. The setting is global and stored in
 - Rules are global; there is no per-project rules folder.
 - Rule files are trusted instructions. Only point the rules folder at a
   location you control.
-- If the folder or config cannot be read, Pi shows a warning once and runs
-  without model rules.
+- If the config, a custom rules folder or a rule file cannot be read, Pi shows
+  a warning once and runs without model rules. `/pi-model-rules` shows the
+  cause and still lets you change the folder.
+- Windows file names cannot contain `*`, so only exact-ID rule files work on a
+  native Windows filesystem.
 
 ## Development
 
