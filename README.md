@@ -47,6 +47,14 @@ model with no matching file removes the section.
 Rules also apply in print, JSON and RPC modes, and in any child Pi process that
 loads this package.
 
+### Example
+
+[`examples/delegation.md`](examples/delegation.md) is a real rule file, saved
+as `claude-fable-*.md`. It counters one model family's habit of doing work
+itself instead of delegating it. It refers to a `delegate` tool with `recon`
+and `implement` roles from a separate extension, so adapt the names to your own
+tools rather than copying it unchanged.
+
 ## Inspect and configure
 
 Run **`/pi-model-rules`** to see:
