@@ -10,7 +10,7 @@ const name = (model: ModelRef) => `${model.provider}/${model.id}`;
 const plural = (count: number, word: string) => `${count} ${word}${count === 1 ? "" : "s"}`;
 const reason = (error: unknown) => error instanceof Error ? error.message : String(error);
 /** File names and rule text are shown in dialogs; drop terminal control characters, keep tabs and newlines. */
-const visible = (text: string) => text.replace(/[\u0000-\u0008\u000b-\u001f\u007f-\u009f]/g, "");
+export const visible = (text: string) => text.replace(/[\u0000-\u0008\u000b-\u001f\u007f-\u009f]/g, "");
 
 async function showRule(ctx: ExtensionCommandContext, dir: string, rule: Rule, models: ModelRef[]): Promise<void> {
 	const matched = models.filter((model) => matches(rule.pattern, model)).map(name);
@@ -58,7 +58,7 @@ export async function showMenu(ctx: ExtensionCommandContext, agentDir: string): 
 			await showRule(ctx, dir!, rules[rows.indexOf(choice)], models);
 			continue;
 		}
-		const input = await ctx.ui.input(`Rules folder — absolute or ~/ path; blank resets to ${fallback}`, dir ?? fallback);
+		const input = await ctx.ui.input(visible(`Rules folder — absolute or ~/ path; blank resets to ${fallback}`), visible(dir ?? fallback));
 		if (input === undefined) continue;
 		const next = input.trim() ? resolveRulesDir(input) : undefined;
 		if (input.trim() && !next) ctx.ui.notify("Rules folder must be an absolute or ~/ path", "error");

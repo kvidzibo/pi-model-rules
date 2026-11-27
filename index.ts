@@ -1,10 +1,11 @@
 import { getAgentDir, type ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import { loadRulesDir } from "./src/config.ts";
-import { showMenu } from "./src/menu.ts";
+import { showMenu, visible } from "./src/menu.ts";
 import { rulesFor } from "./src/rules.ts";
 
 const SECTION = "model_rules";
-const message = (error: unknown) => `pi-model-rules: ${error instanceof Error ? error.message : String(error)}`;
+// Error messages can quote user-chosen paths; keep terminal controls out of notifications.
+const message = (error: unknown) => visible(`pi-model-rules: ${error instanceof Error ? error.message : String(error)}`).replaceAll("\n", " ");
 
 export default function (pi: ExtensionAPI) {
 	let reported: string | undefined;

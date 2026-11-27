@@ -53,6 +53,7 @@ test("an exact model ID outranks a broader provider wildcard; only regular files
 	mkdirSync(join(dir, "gpt-*.md"));
 	symlinkSync(join(dir, "gpt-*.md"), join(dir, "gpt-5*.md"));
 	symlinkSync(join(dir, "gpt-5.md"), join(dir, "gpt-*5.md"));
+	symlinkSync(join(dir, "gone.md"), join(dir, "*.md"));
 	assert.deepEqual(await rulesFor(dir, { provider: "openai", id: "gpt-5" }),
 		{ files: ["*__gpt-5*.md", "gpt-*5.md", "gpt-5.md"], text: "broad\n\nexact\n\nexact" });
 });

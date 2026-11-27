@@ -52,8 +52,11 @@ export async function listRules(dir: string, optional = false): Promise<Rule[]> 
 	const rules: Array<Rule & { rank: [number, number] }> = [];
 	for (const entry of entries) {
 		if (!entry.name.endsWith(".md") || entry.name.length === 3 || entry.name.startsWith(".")) continue;
-		// Symlinked rule files are supported; links to anything else (or nothing) are not rules.
-		const regular = entry.isFile() || (entry.isSymbolicLink() && await stat(join(dir, entry.name)).then((target) => target.isFile(), () => false));
+		// Symlinked rule files are supported; links to anything else, or dangling links, are not rules.
+		const regular = entry.isFile() || (entry.isSymbolicLink() && await stat(join(dir, entry.name)).then((target) => target.isFile(), (error: NodeJS.ErrnoException) => {
+			if (error.code === "ENOENT") return false;
+			throw error;
+		}));
 		if (!regular) continue;
 		const pattern = patternOf(entry.name);
 		rules.push({ file: entry.name, pattern, rank: specificity(pattern) });

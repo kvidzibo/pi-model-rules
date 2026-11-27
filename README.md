@@ -34,7 +34,8 @@ The file name, without `.md`, is a pattern for the models the file applies to:
 - `__` stands for `/`. A pattern containing it is matched against
   `provider/model-id`; any other pattern is matched against the model ID alone.
 - All matching files apply. They are joined least specific first — fewer literal
-  characters, then more wildcards — so the most specific file comes last.
+  characters, then more wildcards — so the most specific file comes last. For
+  this ordering a pattern without a provider counts as `*/pattern`.
 - Only regular `.md` files count, including symlinks to them. Empty files are
   ignored.
 
