@@ -49,8 +49,8 @@ loads this package.
 
 ### Example
 
-[`examples/delegation.md`](examples/delegation.md) is a real rule file, saved
-as `claude-fable-*.md`. It counters one model family's habit of doing work
+[`examples/delegation.md`](https://github.com/kvidzibo/pi-model-rules/blob/main/examples/delegation.md)
+is a real rule file, saved as `claude-fable-*.md`. It counters one model family's habit of doing work
 itself instead of delegating it. It refers to a `delegate` tool with `recon`
 and `implement` roles from a separate extension, so adapt the names to your own
 tools rather than copying it unchanged.
